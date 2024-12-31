@@ -11,7 +11,7 @@ import { CpuIcon, PanelsTopLeft, Database, Terminal } from 'lucide-react';
 
 ## 소개
 
-GeOn UI는 ODF를 기반으로 한 **지도 패키지**로 GIS 시스템 개발 시 필요한 기본적인 UI와 Hook을 제공합니다.
+GeOn - UI는 Wavus 솔루션인 ODF를 기반으로 한 **패키지**로 GIS 시스템 개발 시 필요한 기본적인 UI와 Hook을 제공합니다.
 React 기반 프로젝트에 원활하게 통합되어 높은 유연성을 제공합니다.
 
 GeOn UI는 다음과 같은 파트로 구성됩니다:
@@ -20,23 +20,23 @@ GeOn UI는 다음과 같은 파트로 구성됩니다:
 
 <Card icon={<CpuIcon className="text-purple-300" />} title='Map - UI'>
 
-문서 검색, 콘텐츠 소스 어댑터, Markdown 확장 등을 포함한 대부분의 로직을 처리합니다.
+지도와 연동할 수 있는 다양한 컨트롤, TOC (Table of Contents) 를 포함한 UI를 제공합니다.
 
 </Card>
 
 <Card icon={<PanelsTopLeft className="text-blue-300" />} title='Map - Hooks'>
 
-GeOn UI의 기본 테마로, 문서 사이트와 인터랙티브 컴포넌트에 아름다운 외관을 제공합니다.
+지도를 제어할 수 있는 Hook을 제공합니다. 개발자는 직접 Hook을 적절한 요소에 연결할 수 있습니다.
 
 </Card>
 
 </Cards>
 
-### 사용 사례
+{/* ### 사용 사례 */}
 
 ### 문서화
 
-GeOn UI는 **저작 경험**에 중점을 두고 있으며, UI 와 Hook 를 결합한 개발 패턴을 제공합니다.
+GeOn UI는 **개발자를 위한 경험**에 중점을 두고 있으며, UI 와 Hook 를 결합한 개발 패턴을 제공합니다.
 
 이 사이트는 GeOn UI로 구축된 문서 사이트의 예입니다.
 
@@ -50,7 +50,7 @@ GeOn UI는 **저작 경험**에 중점을 두고 있으며, UI 와 Hook 를 결�
 
 `create-geon-app`을 사용하여 새 앱을 만듭니다. Node.js 18+가 필요합니다.
 
-<Tabs groupId='package-manager' items={['npm', 'pnpm', 'yarn', 'bun']}>
+<Tabs groupId='package-manager' items={['npm', 'pnpm', 'yarn']}>
 
 <Tab>
 ```bash tab="npm"
@@ -68,11 +68,6 @@ pnpm create geon-app
 yarn create geon-app
 ```
 </Tab>
-<Tab>
-```bash tab="bun"
-bun create geon-app
-```
-</Tab>
 </Tabs>
 
 CLI 에서 명령을 실행하면 몇 가지 질문이 나옵니다:
@@ -83,22 +78,28 @@ CLI 에서 명령을 실행하면 몇 가지 질문이 나옵니다:
 - 종속성을 설치할까요?
 
 그 후, 새로운 GeOn 앱이 초기화됩니다.
-이제 GeOn UI를 사용할 준비가 되었습니다.
+이제 GeOn - UI를 사용할 준비가 되었습니다.
 
 
 ### 즐기세요!
 
-docs 폴더에 첫 번째 MDX 파일을 만드세요.
+프로젝트를 생성하였다면 다음을 볼 수 있습니다:
 
-```mdx title="content/docs/index.mdx"
----
-title: Hello World
----
+```tsx title="app/page.tsx"
+// 두가지 방식 중 선택 필요
+import { Map } from '@/components/map-ui';  // CLI 설치한 경우   
+import { Map } from '@geon/map-ui';         // NPM 설치한 경우
 
-## Yo what's up
+export default function Page() {
+  return (
+    <main className="flex flex-1 flex-col justify-center text-center">
+      <Map />
+    </main>
+  );
+}
 ```
 
-앱을 개발 모드로 실행하고 http://localhost:3000/docs를 확인하세요.
+앱을 개발 모드로 실행하고 http://localhost:3000/ 에서 지도를 확인하세요.
 
 ```package-install
 npm run dev
@@ -108,21 +109,22 @@ npm run dev
 
 프로젝트에서 다음을 볼 수 있습니다:
 
-- `lib/source.ts`: 콘텐츠 소스 어댑터를 위한 코드를 구성하는 곳입니다. [`loader`](/docs/headless/source-api) API를 사용하여 콘텐츠 소스에서 로드합니다.
-- `app/layout.config.tsx`: 레이아웃에 대한 공유 옵션입니다. 선택 사항이지만 유지하는 것이 좋습니다.
-- `app/(home)`: 랜딩 페이지 및 기타 페이지를 위한 라우트 그룹입니다.
-- `app/docs`: 문서 레이아웃 및 페이지입니다.
-- `app/api/search/route.ts`: 검색을 위한 라우트 핸들러입니다.
+- `app/globals.css`: Map Container 의 기본 스타일이 정의되어 있습니다. 
+```css
+.odf-map {
+  width: 100%;
+  height: 100%;
+}
+```
 
-#### 콘텐츠 소스
-
-콘텐츠 소스의 문서를 참조하세요. 콘텐츠 소스는 콘텐츠의 유효성 검사 및 타입 정의를 관리하고 이를 JavaScript 런타임의 데이터로 변환합니다.
-
-GeOn MDX의 경우, 자세한 내용은 [소개](/docs/mdx)를 참조하세요:
-
-- `source.config.ts`: GeOn MDX의 구성 파일입니다.
-
-기본적으로 지원되지 않는 다른 형식 및 콘텐츠 소스(e.g. Sanity)의 경우, [사용자 정의 콘텐츠 소스 빌드](/docs/headless/remote)를 참조하세요.
+- `app/componets/map.tsx`: Map-Hooks 와 통합된 배경지도 컨트롤을 추가한 예시를 보여줍니다.
+```tsx
+export function Page() {
+  return (
+    ...
+  )
+}
+```
 
 ## FAQ
 
@@ -153,97 +155,20 @@ pnpm geon add
 이는 Shadcn UI와 매우 유사합니다.
 
     </Accordion>
-    <Accordion id='fix-monorepo-styling' title="모노레포에서 스타일이 적용되지 않는 문제를 어떻게 해결하나요?">
-
-때때로, `geon-ui`가 Tailwind CSS 구성 파일의 작업 공간에 설치되지 않습니다. (예: 모노레포 설정).
-
-공식 Tailwind CSS 플러그인을 사용할 때, `geon-ui` 패키지의 파일을 찾을 수 없습니다.
-
-이를 해결하려면 Tailwind CSS 구성을 편집하고 `content` 섹션에서 `./node_modules`를 `../../node_modules`로 교체하세요.
-
-```js
-export default {
-  content: [
-    './node_modules/geon-ui/dist/**/*.js', // [!code --]
-    '../../node_modules/geon-ui/dist/**/*.js', // [!code ++]
-    './components/**/*.{ts,tsx}',
-    // ...
-  ],
-};
-```
-
-    </Accordion>
-    <Accordion id='change-base-url' title="기본 경로 /docs를 어떻게 변경하나요?">
-
-문서의 기본 경로를 변경할 수 있습니다 (예: `/docs/page`에서 `/info/page`로).
-GeOn UI는 Next.js App Router를 사용하므로, 라우트를 간단히 이름을 변경할 수 있습니다:
-
-<Files>
-  <Folder name="app/docs" defaultOpen className="opacity-50" disabled>
-    <File name="layout.tsx" />
-  </Folder>
-  <Folder name="app/info" defaultOpen>
-    <File name="layout.tsx" />
-  </Folder>
-</Files>
-
-그리고 `source.ts`에서 GeOn UI에 새 경로를 사용하도록 알립니다:
-
-```ts title="source.ts"
-import { createMDXSource } from 'geon-mdx';
-import { loader } from 'geon-core/source';
-import { docs, meta } from '@/.source';
-
-export const source = loader({
-  baseUrl: '/info',
-  source: createMDXSource(docs, meta),
-});
-```
-
-    </Accordion>
-    <Accordion id='dynamic-route' title="동적 라우트를 사용하면 성능이 저하되나요?">
-
-Next.js는 `generateStaticParams`가 구성되면 동적 라우트를 정적 라우트로 변환합니다.
-따라서 정적 페이지만큼 빠릅니다.
-
-Next.js에서 정적 내보내기를 활성화하여 정적 빌드 출력을 얻을 수 있습니다. (라우트 핸들러는 정적 내보내기와 함께 작동하지 않으므로 정적 검색을 구성해야 합니다.)
-
-    </Accordion>
     <Accordion id='pronunciation' title='GeOn UI를 어떻게 발음하나요?'>
         GeOn UI (지온 유아이).
-    </Accordion>
-    <Accordion id='custom-layout-docs-page' title='문서 레이아웃 없이 /docs 페이지를 어떻게 만드나요?'>
-
-Next.js App Router에서 레이아웃을 관리하는 것과 동일하게, 콘텐츠 디렉토리(`/content/docs`)에서 원래 MDX 파일을 제거하세요.
-이렇게 하면 중복된 페이지로 인한 오류가 발생하지 않습니다.
-
-이제 문서 레이아웃의 하위 항목이 아닌 다른 라우트 그룹에 페이지를 추가할 수 있습니다.
-
-예를 들어, `app` 폴더 아래에:
-
-<Files>
-  <File name="(home)/docs/page.tsx" />
-  <Folder name="docs">
-    <File name="layout.tsx" />
-    <File name="[[...slug]]/page.tsx" />
-  </Folder>
-</Files>
-
-이렇게 하면 `/docs` 페이지가 `page.tsx`로 대체됩니다.
-
     </Accordion>
 
 </Accordions>
 
-### 왜 GeOn UI인가요?
+### 왜 GeOn - UI 인가요?
 
-CodeSandbox에서 데모를 열어보고 적합한지 확인하세요.
+데모를 열어보고 적합한지 확인하세요.
 
-- 많은 내장 컴포넌트.
-- Typescript Twoslash, OpenAPI, Math (KaTeX)와의 통합.
-- 기본적으로 유연하고 빠름.
-- App Router 기반으로, 정적 콘텐츠에 대한 하이드레이션이 필요 없음.
-- 기존 Next.js 프로젝트에서 리팩토링 없이 사용 가능.
+- 기존 React 프로젝트에서 리팩토링 없이 사용 가능.
+- 모던하고 커스터마이징 가능한 컴포넌트 제공.
+- ...
+
 
 관심이 있다면 [비교](/docs/ui/comparisons)를 읽어보세요.
 
@@ -256,23 +181,23 @@ CodeSandbox에서 데모를 열어보고 적합한지 확인하세요.
 <Cards>
   <Card
     href="/docs/ui/page-conventions"
-    title="페이지 구성"
-    description="페이지를 구성하는 방법을 알아보세요"
+    title="지도 생성"
+    description="지도를 생성하는 방법을 알아보세요"
   />
   <Card
     href="/docs/ui/navigation"
-    title="탐색 링크"
-    description="GeOn UI에서 탐색 링크를 커스터마이징하는 방법을 알아보세요"
+    title="컨트롤 추가"
+    description="지도에 컨트롤을 추가하고 관리하는 방법을 알아보세요"
   />
   <Card
     href="/docs/ui/theme"
-    title="테마"
-    description="GeOn UI에 테마를 추가하세요"
+    title="TOC 관리"
+    description="TOC(Table of Contents)를 관리하는 방법을 알아보세요"
   />
   <Card
     href="/docs/ui/markdown"
-    title="Markdown"
-    description="GeOn UI에서 문서를 작성하는 방법을 알아보세요"
+    title="스타일 변경"
+    description="스타일을 변경하는 방법을 알아보세요"
   />
 </Cards>
 
