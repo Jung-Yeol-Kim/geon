@@ -50,3 +50,21 @@ export interface MapInitializeOptions {
   projection?: string;
   basemap?: string;
 }
+
+export interface UseMapOptions {
+  center?: [number, number];
+  zoom?: number;
+  projection?: string;
+  baroEMapURL?: string;
+  baroEMapAirURL?: string;
+  basemap?: {
+    baroEMap: string[];
+  };
+  optimization?: boolean;
+}
+
+export interface MapProps extends UseMapOptions {
+  className?: string;
+  style?: React.CSSProperties;
+  onMapLoad?: (map: any) => void;
+}

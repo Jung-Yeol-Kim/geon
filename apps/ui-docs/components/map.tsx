@@ -1,36 +1,41 @@
-import { useRef } from 'react'
-import { useMap } from '@repo/map-hooks'
-import { cn } from '@/lib/utils'
+'use client';
+
+import React from 'react';
+import { useMap } from '@geon/map-hooks';
+import { cn } from 'fumadocs-ui/components/api';
 
 interface MapProps {
-  initialCenter?: [number, number]
-  initialZoom?: number
-  basemap?: string
-  className?: string
+  center?: [number, number];
+  zoom?: number;
+  projection?: string;
+  basemap?: {
+    baroEMap: string[];
+  };
+  className?: string;
 }
 
 export function Map({
-  initialCenter,
-  initialZoom,
+  center,
+  zoom,
+  projection,
   basemap,
   className,
 }: MapProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { controller } = useMap({
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const { map, isInitialized } = useMap({
     containerRef,
-    initialCenter,
-    initialZoom,
+    center,
+    zoom,
+    projection,
     basemap,
     autoInit: true,
-  })
+  });
 
   return (
-    <div 
+    <div
+      id="map"
       ref={containerRef}
-      className={cn(
-        "relative w-full aspect-video rounded-lg border",
-        className
-      )}
+      className={cn('relative w-full h-[400px]', className)}
     />
-  )
+  );
 }

@@ -1,0 +1,106 @@
+---
+title: Map
+description: 지도 컴포넌트
+---
+
+import { Map } from '@/components/map';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+<Map />
+
+## CLI
+<Tabs groupId='package-manager' items={['npm', 'pnpm', 'yarn']}>
+
+<Tab>
+```bash tab="npm"
+npx geon@latest add map
+```
+</Tab>
+
+<Tab>
+```bash tab="pnpm"
+pnpm dlx geon@latest add map
+```
+</Tab>
+
+<Tab>
+```bash tab="yarn"
+npx geon@latest add map
+```
+</Tab>
+
+</Tabs>
+
+## 사용법
+
+```tsx
+import { useMap } from '@geon/map-hooks';
+
+export function Map({
+  center,
+  zoom,
+  projection,
+  basemap,
+  className,
+}: MapProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const { map } = useMap({
+    containerRef,
+    center,
+    zoom,
+    projection,
+    basemap,
+    autoInit: true,
+  });
+
+  return (
+    <div
+      id="map"
+      ref={containerRef}
+      className={cn('relative w-full h-[400px]', className)}
+    />
+  );
+}
+```
+
+## Props
+
+### center
+
+- 타입: `[number, number]`
+- 필수: 아니오
+- 기본값: `[199312.9996, 551784.6924]`
+
+지도의 중심 좌표를 설정합니다.
+
+### zoom
+
+- 타입: `number`
+- 필수: 아니오
+- 기본값: `11`
+
+지도의 확대/축소 레벨을 설정합니다.
+
+### projection
+
+- 타입: `string`
+- 필수: 아니오
+- 기본값: `"EPSG:5186"`
+
+지도의 좌표계를 설정합니다.
+
+### basemap
+
+- 타입: `{ baroEMap: string[] }`
+- 필수: 아니오
+- 기본값: `{ baroEMap: ["eMapBasic", "eMapAIR", "eMapColor", "eMapWhite"] }`
+
+지도의 기본 레이어를 설정합니다.
+
+### className
+
+- 타입: `string`
+- 필수: 아니오
+
+지도 컨테이너의 스타일을 설정합니다.
+

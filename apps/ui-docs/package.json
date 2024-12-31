@@ -9,8 +9,7 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
-    "@repo/map-hooks": "workspace:*",
+    "@geon/map-hooks": "workspace:*",
     "next": "15.1.2",
     "fumadocs-ui": "14.6.8",
     "fumadocs-core": "14.6.8",

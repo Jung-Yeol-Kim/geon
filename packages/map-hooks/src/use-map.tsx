@@ -24,42 +24,79 @@ interface MapController {
 }
 
 interface UseMapOptions extends MapInitializeOptions {
+  containerRef: React.RefObject<HTMLDivElement>;
   autoInit?: boolean;  // 자동으로 초기화할지 여부
 }
 
-export function useMap(containerRef: React.RefObject<HTMLDivElement>, options: UseMapOptions = {}) {
+export function useMap(options: UseMapOptions) {
   const [map, setMap] = useState<any | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const controllerRef = useRef<MapController | null>(null);
 
   const initialize = useCallback(async () => {
-    if (!containerRef.current || isInitialized) return;
+    if (!options.containerRef.current || isInitialized) return;
+
+    // ODF 존재 여부 체크
+    const checkODF = () => {
+      return new Promise<void>((resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 30; // 3초 동안 100ms 간격으로 체크
+        const interval = setInterval(() => {
+          attempts++;
+          if ((window as any).odf) {
+            clearInterval(interval);
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            clearInterval(interval);
+            reject(new Error('ODF가 프로젝트에 추가되지 않았습니다. ODF를 프로젝트에 추가해주세요.'));
+          }
+        }, 100);
+      });
+    };
 
     try {
-      // TODO: Implement actual ODF map initialization
-      const mapInstance = {} as any; // placeholder
-      
-      // 컨트롤러 객체 생성
+      await checkODF();
+      const mapContainer = options.containerRef.current;
+      const coord = new odf.Coordinate(
+        options.center?.[0] ?? 199312.9996,
+        options.center?.[1] ?? 551784.6924
+      );
+
+      const mapOption = {
+        center: coord,
+        zoom: options.zoom ?? 11,
+        projection: options.projection ?? "EPSG:5186",
+        baroEMapURL: options.baroEMapURL ?? "https://geon-gateway.geon.kr/map/api/map/baroemap",
+        baroEMapAirURL: options.baroEMapAirURL ?? "https://geon-gateway.geon.kr/map/api/map/ngisair",
+        basemap: options.basemap ?? {
+          baroEMap: ["eMapBasic", "eMapAIR", "eMapColor", "eMapWhite"],
+        },
+        optimization: options.optimization ?? true,
+      };
+
+      const odfMap: any = new odf.Map(mapContainer, mapOption);
+      setMap(odfMap);
+
+      const basemapControl = new odf.BasemapControl();
+      basemapControl.setMap(odfMap);
+      odfMap.basemapControl = basemapControl;
+
       const controller: MapController = {
         view: {
           setCenter: (center) => {
-            // TODO: Implement with ODF
-            console.log('Setting center:', center);
+            odfMap.setCenter(new odf.Coordinate(center[0], center[1]));
           },
           setZoom: (zoom) => {
-            // TODO: Implement with ODF
-            console.log('Setting zoom:', zoom);
+            odfMap.setZoom(zoom);
           },
           setBasemap: (basemap) => {
-            // TODO: Implement with ODF
-            console.log('Setting basemap:', basemap);
+            odfMap.setBasemap(basemap);
           },
-          getCenter: () => [0, 0], // TODO: Implement with ODF
-          getZoom: () => 1, // TODO: Implement with ODF
+          getCenter: () => [odfMap.getCenter().x, odfMap.getCenter().y],
+          getZoom: () => odfMap.getZoom(),
         },
         layer: {
           add: (layerConfig) => {
-            // TODO: Implement with ODF
             const newLayer: Layer = {
               id: String(Date.now()),
               name: layerConfig.name || 'New Layer',
@@ -69,17 +106,15 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement>, options: U
             return newLayer;
           },
           remove: (layerId) => {
-            // TODO: Implement with ODF
             console.log('Removing layer:', layerId);
           },
           toggle: (layerId) => {
-            // TODO: Implement with ODF
             console.log('Toggling layer:', layerId);
           },
-          getAll: () => [], // TODO: Implement with ODF
+          getAll: () => [],
         },
         destroy: () => {
-          // TODO: Implement actual cleanup
+          odfMap.destroy();
           setMap(null);
           setIsInitialized(false);
           controllerRef.current = null;
@@ -87,20 +122,29 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement>, options: U
       };
 
       controllerRef.current = controller;
-      setMap(mapInstance);
       setIsInitialized(true);
     } catch (error) {
       console.error('Failed to initialize map:', error);
       throw error;
     }
-  }, [containerRef, isInitialized]);
+  }, [isInitialized, options]);
 
-  // autoInit이 true인 경우 자동으로 초기화
   useEffect(() => {
     if (options.autoInit) {
       initialize();
     }
   }, [initialize, options.autoInit]);
+
+  useEffect(() => {
+    if (!map) return;
+
+    if (options.center) {
+      map.setCenter(new odf.Coordinate(options.center[0], options.center[1]));
+    }
+    if (options.zoom !== undefined) {
+      map.setZoom(options.zoom);
+    }
+  }, [options.center, options.zoom]);
 
   return {
     map,
